@@ -88,4 +88,33 @@ npm run dev
 
 ## Screenshot
 
-![Screenshot 2024-07-28 170815](https://github.com/user-attachments/assets/a1d2e22b-d335-4774-b82e-bfcfc2b1ceca)
+1. Landing Page
+
+![Landing Page](https://github.com/user-attachments/assets/a1d2e22b-d335-4774-b82e-bfcfc2b1ceca)
+
+
+2. Login Page
+
+![Login Page](https://github.com/user-attachments/assets/9e1e6e76-29ab-4be7-929f-3135f9d00698)
+
+
+3. Dashboard Page
+
+![Dashboard Page](https://github.com/user-attachments/assets/cd6aa6ea-9e0c-47a6-b19d-7b7f39d5ed0d)
+
+
+4. Select Difficulty
+
+![Start Quiz](https://github.com/user-attachments/assets/b3820744-1a49-41e3-a2fe-10d54e940aab)
+
+
+5. Quiz Page
+
+![Quiz Page 1](https://github.com/user-attachments/assets/5bbf4944-cff2-4318-84ca-89064811e1cb)
+
+
+![Quiz Page 2](https://github.com/user-attachments/assets/86a26b7e-90f4-4cd9-a7fd-b531cd3a545d)
+
+6. Result Page
+
+![Result Page](https://github.com/user-attachments/assets/74f5b932-98e5-49a2-85a1-ee2613cc3af8)

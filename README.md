@@ -44,7 +44,7 @@ git clone https://github.com/vunky-himawan/quizin.git
 2. Install dependensi
 
 ```bash
-npm install or pnpm install
+npm install
 ```
 
 3. Buat file .env
@@ -68,10 +68,10 @@ create database quiz_app;
 exit
 ```
 
-6. Jalankan migrasi
+6. Push Schema ke Database
 
 ```bash
-npx drizzle-kit migrate
+npx drizzle-kit push
 ```
 
 7. Jalankan seeder

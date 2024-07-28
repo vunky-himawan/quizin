@@ -18,8 +18,8 @@ const ResultPage = () => {
     <>
       <QuizLayout>
         <div className="col-span-4 flex flex-col gap-5">
-          {quizResult?.QuizAnswers.map((question) => (
-            <Card key={question.question}>
+          {quizResult?.QuizAnswers.map((question, index) => (
+            <Card key={`${question.question}-${index.toString()}`}>
               <CardHeader>
                 <CardTitle className="text-center text-2xl">
                   {decode(question.question)}
@@ -27,7 +27,8 @@ const ResultPage = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col gap-2">
-                  {question.answers.map((answer: string) => {
+                  {question.answers.map((answer: string, index: number) => {
+                    const key = `${question.question}-${index.toString()}`;
                     if (
                       question.userAnswer !== question.correct_answer &&
                       answer === question.userAnswer
@@ -35,7 +36,7 @@ const ResultPage = () => {
                       return (
                         <>
                           <div
-                            key={answer}
+                            key={key}
                             className="bg-red-400 text-white p-2 rounded-lg text-center"
                           >
                             {decode(answer)}
@@ -45,7 +46,7 @@ const ResultPage = () => {
                     } else {
                       return (
                         <div
-                          key={answer}
+                          key={key}
                           className={`${
                             answer === question.correct_answer
                               ? "bg-green-400 text-white "

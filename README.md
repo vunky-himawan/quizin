@@ -1,6 +1,6 @@
 ## Pengenalan
 
-Aplikasi ini merupakan challenge yang diberikan oleh DOT Indonesia untuk memenuhi persyaratan magang yaitu membuat quiz app dengan menggunakan React.
+Repositori ini merupakan quiz app sederhana, ini merupakan challenge yang diberikan oleh DOT Indonesia untuk memenuhi persyaratan magang yaitu membuat quiz app dengan menggunakan React.
 
 ## Fitur
 
@@ -85,3 +85,7 @@ npm run db:seed
 ```bash
 npm run dev
 ```
+
+## Screenshot
+
+![Screenshot 2024-07-28 170815](https://github.com/user-attachments/assets/a1d2e22b-d335-4774-b82e-bfcfc2b1ceca)

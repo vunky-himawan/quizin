@@ -5,13 +5,14 @@ import dotenv from "dotenv";
 dotenv.config();
 
 if (
-  !process.env.DB_HOST ||
-  !process.env.DB_USERNAME ||
-  !process.env.DB_PASSWORD ||
+  !process.env.DB_HOST &&
+  !process.env.DB_USERNAME &&
+  !process.env.DB_PASSWORD &&
   !process.env.DB_DATABASE
 ) {
   throw new Error("Database credentials are missing");
 }
+
 const connection = mysql.createPool({
   host: process.env.DB_HOST,
   user: process.env.DB_USERNAME,

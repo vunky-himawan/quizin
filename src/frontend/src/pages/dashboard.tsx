@@ -28,7 +28,13 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const DashboardPage = () => {
-  const { generateQuestion, categories, difficulty, setDifficulty } = useQuiz();
+  const {
+    generateQuestion,
+    categories,
+    difficulty,
+    setDifficulty,
+    generateCategories,
+  } = useQuiz();
   const [selectedCategory, setSelectedCategory] = useState<number>(
     localStorage.getItem("X-CATEGORY-SELECTED")
       ? Number(localStorage.getItem("X-CATEGORY-SELECTED"))
@@ -49,6 +55,10 @@ const DashboardPage = () => {
     }
     navigate("/user/quiz");
   };
+
+  useEffect(() => {
+    generateCategories();
+  }, []);
 
   const handleResume = () => {
     setIsPaused(false);

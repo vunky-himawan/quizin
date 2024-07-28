@@ -1,6 +1,6 @@
 import { useToast } from "@/components/ui/use-toast";
 import { QuestionService } from "@/service/question";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { useAuth } from "./authContext";
 import QuizAnswer from "@/types/QuizAnswer";
 import Category from "@/types/Category";
@@ -41,10 +41,6 @@ const QuizProvider = ({ children }: { children: React.ReactNode }) => {
 
     setCategories(response.trivia_categories);
   };
-
-  useEffect(() => {
-    generateCategories();
-  }, []);
 
   const generateQuestion = async (difficulty: string, category: number) => {
     toast({

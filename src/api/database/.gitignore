@@ -1,2 +1,2 @@
-# Ignore Migrations
-migrations
+# Ignore Migrations Directory
+migrations/*

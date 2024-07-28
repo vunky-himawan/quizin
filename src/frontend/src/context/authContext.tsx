@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from "axios";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 
 const AuthContext = createContext({} as ContextType);
@@ -25,10 +25,6 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [username, setUsername] = useState<string>("");
   const [expiredIn, setExpiredIn] = useState<number>(0);
 
-  useEffect(() => {
-    refreshToken();
-  }, []);
-
   const login = async (username: string, password: string) => {
     const data = { username, password };
 
@@ -47,15 +43,10 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      await axios
-        .delete("http://localhost:3000/auth/logout")
-        .then(() => {
-          localStorage.removeItem("token");
-          setToken(null);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+      await axios.delete("http://localhost:3000/auth/logout").then(() => {
+        localStorage.removeItem("token");
+        setToken(null);
+      });
     } catch (error) {
       console.log(error);
     }

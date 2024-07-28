@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1721740571142,
+      "tag": "0000_spicy_the_professor",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1721973847033,
+      "tag": "0001_volatile_aqueduct",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1721973943321,
+      "tag": "0002_melodic_mandarin",
+      "breakpoints": true
+    }
+  ]
+}

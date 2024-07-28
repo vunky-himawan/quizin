@@ -83,8 +83,12 @@ const QuestionPage = () => {
     }
   }, [currentQuizQuestion, index]);
 
-  const handleAnswer = (answer: string) => {
+  const handleAnswer = async (answer: string) => {
     setSelectedAnswer(answer);
+
+    if (lastQuizQuestion) {
+      await handleFinish();
+    }
 
     if (selectedAnswer === answer) {
       answeredQuestion.userAnswer = "";
@@ -185,13 +189,6 @@ const QuestionPage = () => {
                 ))}
               </div>
             </CardContent>
-            <CardFooter>
-              {lastQuizQuestion && (
-                <Button onClick={handleFinish} disabled={selectedAnswer === ""}>
-                  Finish
-                </Button>
-              )}
-            </CardFooter>
           </Card>
         )}
 

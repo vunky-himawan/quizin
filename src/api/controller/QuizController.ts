@@ -136,7 +136,6 @@ const getQuizResult = async (req: Request, res: Response) => {
     let correctAnswersCount = 0;
     let incorrectAnswersCount = 0;
     let score = 0;
-    let totalAnsweredQuestions = 0;
     let quizAnswerUpdated: QuizAnswer[] = [];
 
     await db.transaction(async (tx) => {
@@ -148,10 +147,6 @@ const getQuizResult = async (req: Request, res: Response) => {
       data.forEach(async (question: QuizAnswer, index: number) => {
         const correct_answer = quizAnswers[index].correctAnswer;
         const userAnswer = question.userAnswer;
-
-        if (userAnswer !== "") {
-          totalAnsweredQuestions++;
-        }
 
         const correctedAnswer = QuestionService.correctedAnswer({
           totalQuestions: data.length,
@@ -177,7 +172,7 @@ const getQuizResult = async (req: Request, res: Response) => {
 
       const quizResult: QuizResult = {
         totalQuestions: data.length,
-        totalAnsweredQuestions,
+        totalAnsweredQuestions: correctAnswersCount + incorrectAnswersCount,
         totalCorrectAnswers: correctAnswersCount,
         totalIncorrectAnswers: incorrectAnswersCount,
         percentageCorrectAnswers: correctAnswersCount / data.length,

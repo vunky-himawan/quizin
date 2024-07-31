@@ -14,13 +14,13 @@ const IndexPage = () => {
           </div>
           <div className="flex flex-col gap-5">
             <h1 className="font-bold text-4xl lg:text-6xl">
-              Tantang Diri Anda - Mainkan Kuisnya!
+              Challenge Yourself - Play the Quiz!
             </h1>
             <p className="lg:text-xl">
-              Anda merasa sudah mengetahui semuanya? Uji pengetahuan Anda dengan
-              kuis kami yang menyenangkan dan menarik!
+              Think you know it all? Test your knowledge with our fun and
+              engaging quizzes!
             </p>
-            <a href="/login">
+            <a href="/auth/login" className="w-fit">
               <Button className="bg-sky-500 w-fit">Login</Button>
             </a>
           </div>

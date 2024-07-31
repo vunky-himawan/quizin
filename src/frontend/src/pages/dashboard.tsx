@@ -48,6 +48,7 @@ const DashboardPage = () => {
 
   const handleStart = async (category: number) => {
     localStorage.setItem("X-CATEGORY-SELECTED", category.toString());
+    localStorage.setItem("X-QUIZ-DIFFICULTY", difficulty);
     setIsPaused(false);
     setSelectedCategory(category);
     if (!localStorage.getItem("X-Quiz-Questions")) {
@@ -73,7 +74,7 @@ const DashboardPage = () => {
 
   return (
     <>
-      <main className="w-screen h-fit overflow-x-hidden relative flex flex-col p-5">
+      <main className="h-fit overflow-x-hidden relative flex flex-col p-5">
         <Header />
         <section className="max-w-7xl mx-auto h-full gap-5 w-full py-24 flex flex-col">
           {isLoading && (
@@ -123,7 +124,10 @@ const DashboardPage = () => {
                     </SelectContent>
                   </Select>
                   <DialogFooter>
-                    <Button onClick={() => handleStart(category.id)}>
+                    <Button
+                      disabled={difficulty === ""}
+                      onClick={() => handleStart(category.id)}
+                    >
                       Confirm
                     </Button>
                     <DialogClose>Cancel</DialogClose>

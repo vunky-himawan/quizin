@@ -1,10 +1,11 @@
 import { bigint, mysqlTable, timestamp, varchar } from "drizzle-orm/mysql-core";
 
+
+
 export const users = mysqlTable("users", {
   id: bigint("id", { mode: "number", unsigned: true })
     .autoincrement()
     .primaryKey(),
-  name: varchar("name", { length: 255 }).notNull(),
   username: varchar("username", { length: 255 }).notNull(),
   password: varchar("password", { length: 255 }).notNull(),
   refreshToken: varchar("refresh_token", { length: 255 }),

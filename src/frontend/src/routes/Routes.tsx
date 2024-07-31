@@ -14,6 +14,7 @@ import { useAuth } from "@/context/authContext";
 import NotFoundPage from "@/pages/error";
 import ResultPage from "@/pages/result";
 import { ProtectedResultQuiz } from "./ProtectedResultQuiz";
+import AuthGuard from "./AuthGuard";
 
 const Routes = () => {
   const { token } = useAuth();
@@ -24,8 +25,14 @@ const Routes = () => {
       element: <IndexPage />,
     },
     {
-      path: "/login",
-      element: <AuthPage />,
+      path: "/auth/:action",
+      element: <AuthGuard />,
+      children: [
+        {
+          path: "/auth/:action",
+          element: <AuthPage />,
+        },
+      ],
     },
   ];
 

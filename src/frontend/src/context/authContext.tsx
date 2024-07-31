@@ -11,6 +11,9 @@ type ContextType = {
   refreshToken: () => void;
   username: string;
   axiosRefreshToken: AxiosInstance;
+  error: string;
+  setError: React.Dispatch<React.SetStateAction<string>>;
+  register: (username: string, password: string) => void;
 };
 
 interface JwtPayloadCustom extends JwtPayload {
@@ -24,6 +27,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   );
   const [username, setUsername] = useState<string>("");
   const [expiredIn, setExpiredIn] = useState<number>(0);
+  const [error, setError] = useState<string>("");
 
   const login = async (username: string, password: string) => {
     const data = { username, password };
@@ -37,6 +41,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setToken(response.data.accessToken as string);
       localStorage.setItem("token", response.data.accessToken);
     } catch (error) {
+      setError(error.response.data.message as string);
       console.log(error);
     }
   };
@@ -69,6 +74,22 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const register = async (username: string, password: string) => {
+    const data = { username, password };
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/auth/register",
+        data
+      );
+
+      return response;
+    } catch (error) {
+      setError(error.response.data.message as string);
+      console.log(error);
+    }
+  };
+
   const axiosRefreshToken: AxiosInstance = axios.create();
 
   axiosRefreshToken.interceptors.request.use(
@@ -88,10 +109,13 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const context: ContextType = {
     token,
     login,
+    error,
     logout,
     refreshToken,
     username,
     axiosRefreshToken,
+    setError,
+    register,
   };
 
   return (

@@ -1,11 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuiz } from "@/context/quizContext";
 import { QuestionService } from "@/service/question";
 import QuizAnswer from "@/types/QuizAnswer";
@@ -86,10 +80,6 @@ const QuestionPage = () => {
   const handleAnswer = async (answer: string) => {
     setSelectedAnswer(answer);
 
-    if (lastQuizQuestion) {
-      await handleFinish();
-    }
-
     if (selectedAnswer === answer) {
       answeredQuestion.userAnswer = "";
       setSelectedAnswer("");
@@ -100,6 +90,10 @@ const QuestionPage = () => {
         question: currentQuizQuestion.question,
         answer,
       });
+    }
+
+    if (lastQuizQuestion) {
+      await handleFinish();
     }
 
     handleNext();
@@ -168,7 +162,7 @@ const QuestionPage = () => {
         {isStarted && (
           <Card className="col-span-4">
             <CardHeader>
-              <CardTitle className="text-center text-2xl">
+              <CardTitle className="text-center text-2xl select-none">
                 {decode(currentQuizQuestion.question)}
               </CardTitle>
             </CardHeader>
@@ -182,7 +176,7 @@ const QuestionPage = () => {
                       selectedAnswer === answer
                         ? "bg-green-500 text-white"
                         : "bg-white text-black"
-                    }  hover:bg-green-500 hover:text-white`}
+                    }  hover:bg-green-500 hover:text-white select-none`}
                   >
                     {decode(answer)}
                   </Button>

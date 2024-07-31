@@ -148,8 +148,40 @@ const Logout = async (req: Request, res: Response) => {
   }
 };
 
+const Register = async (req: Request, res: Response) => {
+  try {
+    const user: User[] = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, req.body.username));
+
+    if (user.length) {
+      return res.status(400).json({
+        error: "user_already_exist",
+        message: "Username already exist",
+      });
+    }
+
+    const hashedPassword: string = await bcrypt.hash(req.body.password, 10);
+
+    await db
+      .insert(users)
+      .values({ username: req.body.username, password: hashedPassword });
+
+    res.status(200).json({
+      message: "User registered successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: "server_error",
+      message: "Internal Server Error",
+    });
+  }
+};
+
 export const AuthController = {
   Login,
+  Register,
   RefreshToken,
   Logout,
 };

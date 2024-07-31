@@ -23,7 +23,9 @@ type QuizContextType = {
 
 const QuizProvider = ({ children }: { children: React.ReactNode }) => {
   const { axiosRefreshToken } = useAuth();
-  const [difficulty, setDifficulty] = useState<string>("easy");
+  const [difficulty, setDifficulty] = useState<string>(
+    localStorage.getItem("X-QUIZ-DIFFICULTY") || ""
+  );
   const [quizSession, setQuizSession] = useState<number>(0);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -80,6 +82,7 @@ const QuizProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("X-Quiz-Questions");
     localStorage.removeItem("X-CATEGORY-SELECTED");
     localStorage.removeItem("X-ELAPSED-TIME");
+    localStorage.removeItem("X-QUIZ-DIFFICULTY");
   };
 
   const value: QuizContextType = {

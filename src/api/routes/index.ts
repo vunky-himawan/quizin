@@ -9,6 +9,7 @@ const router = express.Router();
 router.get("/users", verifyToken, UserController.getAllUsers);
 
 /* Auth Routes */
+router.post("/auth/register", AuthController.Register);
 router.post("/auth/login", AuthController.Login);
 router.get("/auth/refresh", AuthController.RefreshToken);
 router.delete("/auth/logout", AuthController.Logout);

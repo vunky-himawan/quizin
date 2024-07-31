@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -168,7 +167,7 @@ const QuestionPage = () => {
         {isStarted && (
           <Card className="col-span-4">
             <CardHeader>
-              <CardTitle className="text-center text-2xl">
+              <CardTitle className="text-center text-2xl select-none">
                 {decode(currentQuizQuestion.question)}
               </CardTitle>
             </CardHeader>
@@ -182,7 +181,7 @@ const QuestionPage = () => {
                       selectedAnswer === answer
                         ? "bg-green-500 text-white"
                         : "bg-white text-black"
-                    }  hover:bg-green-500 hover:text-white`}
+                    }  hover:bg-green-500 hover:text-white select-none`}
                   >
                     {decode(answer)}
                   </Button>

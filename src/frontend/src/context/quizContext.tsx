@@ -23,7 +23,7 @@ type QuizContextType = {
 
 const QuizProvider = ({ children }: { children: React.ReactNode }) => {
   const { axiosRefreshToken } = useAuth();
-  const [difficulty, setDifficulty] = useState<string>("easy");
+  const [difficulty, setDifficulty] = useState<string>("");
   const [quizSession, setQuizSession] = useState<number>(0);
   const [quizResult, setQuizResult] = useState<QuizResult | null>(null);
   const [categories, setCategories] = useState<Category[]>([]);

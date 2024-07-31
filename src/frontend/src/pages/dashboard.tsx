@@ -123,7 +123,7 @@ const DashboardPage = () => {
                     </SelectContent>
                   </Select>
                   <DialogFooter>
-                    <Button onClick={() => handleStart(category.id)}>
+                    <Button disabled={difficulty === ""} onClick={() => handleStart(category.id)}>
                       Confirm
                     </Button>
                     <DialogClose>Cancel</DialogClose>

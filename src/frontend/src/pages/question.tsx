@@ -1,10 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuiz } from "@/context/quizContext";
 import { QuestionService } from "@/service/question";
 import QuizAnswer from "@/types/QuizAnswer";
@@ -85,10 +80,6 @@ const QuestionPage = () => {
   const handleAnswer = async (answer: string) => {
     setSelectedAnswer(answer);
 
-    if (lastQuizQuestion) {
-      await handleFinish();
-    }
-
     if (selectedAnswer === answer) {
       answeredQuestion.userAnswer = "";
       setSelectedAnswer("");
@@ -99,6 +90,10 @@ const QuestionPage = () => {
         question: currentQuizQuestion.question,
         answer,
       });
+    }
+
+    if (lastQuizQuestion) {
+      await handleFinish();
     }
 
     handleNext();

@@ -20,7 +20,7 @@ const IndexPage = () => {
               Anda merasa sudah mengetahui semuanya? Uji pengetahuan Anda dengan
               kuis kami yang menyenangkan dan menarik!
             </p>
-            <a href="/login">
+            <a href="/login" className="w-fit">
               <Button className="bg-sky-500 w-fit">Login</Button>
             </a>
           </div>

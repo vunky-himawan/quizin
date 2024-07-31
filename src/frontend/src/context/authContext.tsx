@@ -13,6 +13,7 @@ type ContextType = {
   axiosRefreshToken: AxiosInstance;
   error: string;
   setError: React.Dispatch<React.SetStateAction<string>>;
+  register: (username: string, password: string) => void;
 };
 
 interface JwtPayloadCustom extends JwtPayload {
@@ -35,7 +36,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const response = await axios.post(
         "http://localhost:3000/auth/login",
         data
-      ); 
+      );
 
       setToken(response.data.accessToken as string);
       localStorage.setItem("token", response.data.accessToken);
@@ -73,6 +74,22 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const register = async (username: string, password: string) => {
+    const data = { username, password };
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/auth/register",
+        data
+      );
+
+      return response;
+    } catch (error) {
+      setError(error.response.data.message as string);
+      console.log(error);
+    }
+  };
+
   const axiosRefreshToken: AxiosInstance = axios.create();
 
   axiosRefreshToken.interceptors.request.use(
@@ -97,7 +114,8 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     refreshToken,
     username,
     axiosRefreshToken,
-    setError
+    setError,
+    register,
   };
 
   return (

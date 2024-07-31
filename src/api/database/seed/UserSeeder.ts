@@ -7,7 +7,7 @@ export const seedUsers = async () => {
   await db.delete(users);
 
   const data = [
-    { username: "user", name: "user", password: bycript.hashSync("123") },
+    { username: "user", password: bycript.hashSync("123") },
   ];
 
   // Seed data pengguna

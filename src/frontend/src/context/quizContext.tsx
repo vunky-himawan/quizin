@@ -82,6 +82,7 @@ const QuizProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("X-Quiz-Questions");
     localStorage.removeItem("X-CATEGORY-SELECTED");
     localStorage.removeItem("X-ELAPSED-TIME");
+    localStorage.removeItem("X-QUIZ-DIFFICULTY");
   };
 
   const value: QuizContextType = {

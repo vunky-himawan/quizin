@@ -28,7 +28,7 @@ const ResultPage = () => {
               <CardContent>
                 <div className="flex flex-col gap-2">
                   {question.answers.map((answer: string, index: number) => {
-                    const key = `${question.question}-${index.toString()}`;
+                    const key = `${answer}-${index.toString()}`;
                     if (
                       question.userAnswer !== question.correct_answer &&
                       answer === question.userAnswer

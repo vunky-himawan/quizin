@@ -14,7 +14,7 @@ import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const AuthPage = () => {
-  const { login } = useAuth();
+  const { login, error, setError } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const formRef = useRef<HTMLFormElement>(null);
@@ -33,7 +33,10 @@ const AuthPage = () => {
         alert("Username dan password tidak boleh kosong");
       }
 
+      setError("");
+
       await login(data.username, data.password);
+
       navigate("/user/dashboard");
     } catch (error) {
       console.error("Error while login", error);
@@ -54,6 +57,11 @@ const AuthPage = () => {
               <CardHeader>
                 <CardTitle>Login</CardTitle>
                 <CardDescription>Login to your account</CardDescription>
+                {error && (
+                  <CardDescription className="text-red-500">
+                    {error}
+                  </CardDescription>
+                )}
               </CardHeader>
               <CardContent className="flex flex-col gap-4">
                 <div>

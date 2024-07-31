@@ -19,7 +19,7 @@ const Login = async (req: Request, res: Response) => {
     if (!user.length) {
       return res.status(400).json({
         error: "user_not_found",
-        message: "User not found",
+        message: "User not found"
       });
     }
 

@@ -5,7 +5,7 @@ export const RouteForAuthOnly = () => {
   const { token } = useAuth();
 
   if (!token) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/" />;
   }
 
   return <Outlet />;

@@ -48,6 +48,7 @@ const DashboardPage = () => {
 
   const handleStart = async (category: number) => {
     localStorage.setItem("X-CATEGORY-SELECTED", category.toString());
+    localStorage.setItem("X-QUIZ-DIFFICULTY", difficulty);
     setIsPaused(false);
     setSelectedCategory(category);
     if (!localStorage.getItem("X-Quiz-Questions")) {

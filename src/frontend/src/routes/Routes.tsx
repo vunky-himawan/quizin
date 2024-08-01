@@ -15,7 +15,7 @@ import NotFoundPage from "@/pages/error";
 import ResultPage from "@/pages/result";
 import { ProtectedResultQuiz } from "./ProtectedResultQuiz";
 import AuthGuard from "./AuthGuard";
-import { QuizQuard } from "./QuizGuard";
+import { QuizGuard } from "./QuizGuard";
 
 /**
  * @component Routes
@@ -56,7 +56,7 @@ const Routes = () => {
         },
         {
           path: "/user/quiz",
-          element: <QuizQuard />,
+          element: <QuizGuard />,
           children: [
             {
               path: "",

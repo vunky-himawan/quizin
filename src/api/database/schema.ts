@@ -1,6 +1,12 @@
-import { bigint, mysqlTable, timestamp, varchar } from "drizzle-orm/mysql-core";
-
-
+import { relations } from "drizzle-orm";
+import {
+  bigint,
+  int,
+  mysqlTable,
+  text,
+  timestamp,
+  varchar,
+} from "drizzle-orm/mysql-core";
 
 export const users = mysqlTable("users", {
   id: bigint("id", { mode: "number", unsigned: true })
@@ -13,6 +19,10 @@ export const users = mysqlTable("users", {
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
 
+export const usersRelations = relations(users, ({ many }) => ({
+  quizSessions: many(quizSessions),
+}));
+
 export const quizSessions = mysqlTable("quiz_sessions", {
   id: bigint("quiz_session_id", { mode: "number", unsigned: true })
     .autoincrement()
@@ -20,32 +30,25 @@ export const quizSessions = mysqlTable("quiz_sessions", {
   userId: bigint("user_id", { mode: "number", unsigned: true })
     .notNull()
     .references(() => users.id),
-  totalQuestions: bigint("total_questions", {
-    mode: "number",
-    unsigned: true,
-  }).notNull(),
-  totalCorrectAnswers: bigint("total_correct_answers", {
-    mode: "number",
-    unsigned: true,
-  })
-    .notNull()
-    .default(0),
-  totalIncorrectAnswers: bigint("total_incorrect_answers", {
-    mode: "number",
-    unsigned: true,
-  }),
-  totalAnsweredQuestions: bigint("total_answered_questions", {
-    mode: "number",
-    unsigned: true,
-  })
-    .notNull()
-    .default(0),
-  score: bigint("score", { mode: "number", unsigned: true })
-    .notNull()
-    .default(0),
+  totalQuestions: int("total_questions").notNull(),
+  totalCorrectAnswers: int("total_correct_answers").notNull().default(0),
+  totalIncorrectAnswers: int("total_incorrect_answers").notNull().default(0),
+  totalAnsweredQuestions: int("total_answered_questions").notNull().default(0),
+  score: int("score").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
+
+export const quizSessionsRelations = relations(
+  quizSessions,
+  ({ one, many }) => ({
+    user: one(users, {
+      fields: [quizSessions.userId],
+      references: [users.id],
+    }),
+    quizAnswers: many(quizAnswer),
+  })
+);
 
 export const quizAnswer = mysqlTable("quiz_answer", {
   id: bigint("quiz_answer_question_id", { mode: "number", unsigned: true })
@@ -57,8 +60,15 @@ export const quizAnswer = mysqlTable("quiz_answer", {
   })
     .notNull()
     .references(() => quizSessions.id),
-  question: varchar("question", { length: 255 }).notNull(),
-  correctAnswer: varchar("correct_answer", { length: 255 }).notNull(),
+  question: text("question").notNull(),
+  correctAnswer: text("correct_answer").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 });
+
+export const quisAnswerRelations = relations(quizAnswer, ({ one }) => ({
+  quizSession: one(quizSessions, {
+    fields: [quizAnswer.quizSessionId],
+    references: [quizSessions.id],
+  }),
+}));

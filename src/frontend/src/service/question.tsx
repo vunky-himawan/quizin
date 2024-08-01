@@ -2,6 +2,12 @@ import QuizAnswer from "@/types/QuizAnswer";
 import axios, { AxiosInstance } from "axios";
 axios.defaults.withCredentials = true;
 
+/**
+ * @function getQuizToken
+ * @description Mengambil token quiz dari server.
+ * @param {AxiosInstance} axiosRefreshToken - Axios instance yang digunakan untuk mengambil token quiz.
+ * @returns {Promise<AxiosResponse<string>>} - Promise yang mengembalikan token quiz.
+ */
 const getQuizToken = async ({
   axiosRefreshToken,
 }: {
@@ -25,6 +31,14 @@ const getQuizToken = async ({
   }
 };
 
+/**
+ * @function getQuizQuestions
+ * @description Mengambil pertanyaan quiz dari server.
+ * @param {AxiosInstance} axiosRefreshToken - Axios instance yang digunakan untuk mengambil pertanyaan quiz.
+ * @param {string} difficulty - Tingkat kesulitan pertanyaan quiz.
+ * @param {number} category - Kategori pertanyaan quiz.
+ * @returns {Promise<AxiosResponse<any>>} - Promise yang mengembalikan pertanyaan quiz.
+ */
 const getQuizQuestions = async ({
   axiosRefreshToken,
   difficulty,
@@ -78,6 +92,12 @@ const getQuizQuestions = async ({
   }
 };
 
+/**
+ * @function getCategories
+ * @description Mengambil kategori pertanyaan quiz dari server.
+ * @param {AxiosInstance} axiosRefreshToken - Axios instance yang digunakan untuk mengambil kategori pertanyaan quiz.
+ * @returns {Promise<AxiosResponse<any>>} - Promise yang mengembalikan kategori pertanyaan quiz.
+ */
 const getCategories = async ({
   axiosRefreshToken,
 }: {
@@ -99,19 +119,28 @@ const getCategories = async ({
   }
 };
 
+/**
+ * @function getQuizResult
+ * @description Mengambil hasil quiz dari server.
+ * @param {AxiosInstance} axiosRefreshToken - Axios instance yang digunakan untuk mengambil hasil quiz.
+ * @param {QuizAnswer[]} data - Data pertanyaan quiz yang telah dijawab.
+ * @returns {Promise<AxiosResponse<any>>} - Promise yang mengembalikan hasil quiz.
+ */
 const getQuizResult = async ({
   axiosRefreshToken,
   data,
+  username,
 }: {
   axiosRefreshToken: AxiosInstance;
   data: QuizAnswer[];
+  username: string;
 }) => {
   try {
     const response = await axiosRefreshToken.post(
       "http://localhost:3000/quiz/answer",
       {
         data,
-        quizSessionId: localStorage.getItem("X-Quiz-Session-Id"),
+        quizSessionId: localStorage.getItem(`X-Quiz-Session-Id-${username}`),
       },
       {
         headers: {
@@ -127,30 +156,22 @@ const getQuizResult = async ({
   }
 };
 
-const filterQuestionsFromLocalStorage = (): QuizAnswer[] => {
-  const storedQuestions = localStorage.getItem("X-Quiz-Questions");
-
-  if (!storedQuestions) {
-    return [];
-  }
-
-  const questions = JSON.parse(storedQuestions);
-
-  const filteredQuestions = questions.filter(
-    (q: QuizAnswer) => q.userAnswer === ""
-  );
-
-  return filteredQuestions;
-};
-
+/**
+ * @function updateAnsweredQuestionLocalStorage
+ * @description Menambahkan data pertanyaan quiz yang telah dijawab ke local storage.
+ * @param {string} question - Pertanyaan yang telah dijawab.
+ * @param {string} answer - Jawaban pertanyaan yang telah dijawab.
+ */
 const updateAnsweredQuestionLocalStorage = ({
   question,
   answer,
+  username,
 }: {
   question: string;
   answer: string;
+  username: string;
 }) => {
-  const questions = localStorage.getItem("X-Quiz-Questions");
+  const questions = localStorage.getItem(`X-Quiz-Questions-${username}`);
 
   if (!questions) {
     return;
@@ -166,19 +187,31 @@ const updateAnsweredQuestionLocalStorage = ({
     return q;
   });
 
-  localStorage.setItem("X-Quiz-Questions", JSON.stringify(updatedQuestions));
+  localStorage.setItem(
+    `X-Quiz-Questions-${username}`,
+    JSON.stringify(updatedQuestions)
+  );
 };
 
+/**
+ * @function getQuestionAnsweredCount
+ * @description Mengembalikan jumlah pertanyaan quiz yang telah dijawab.
+ * @param {QuizAnswer[]} questions - Data pertanyaan quiz.
+ * @returns {number} - Jumlah pertanyaan quiz yang telah dijawab.
+ */
 const getQuestionAnsweredCount = (questions: QuizAnswer[]) => {
   return questions.filter((q: QuizAnswer) => q.userAnswer !== "").length;
 };
 
+/**
+ * @constant QuestionService
+ * @description Objek yang menampung fungsi yang digunakan untuk mengambil data dari server.
+ */
 export const QuestionService = {
   getQuizToken,
   getQuizQuestions,
   getQuizResult,
   getCategories,
-  filterQuestionsFromLocalStorage,
   updateAnsweredQuestionLocalStorage,
   getQuestionAnsweredCount,
 };

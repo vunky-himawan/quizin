@@ -15,10 +15,18 @@ import NotFoundPage from "@/pages/error";
 import ResultPage from "@/pages/result";
 import { ProtectedResultQuiz } from "./ProtectedResultQuiz";
 import AuthGuard from "./AuthGuard";
+import { QuizQuard } from "./QuizGuard";
 
+/**
+ * @component Routes
+ * @description Routing aplikasi.
+ * @returns {JSX.Element} - Mengembalikan halaman yang akan ditampilkan sesuai dengan action.
+ */
 const Routes = () => {
+  // Mengambil token dari context.
   const { token } = useAuth();
 
+  // Route publik.
   const publicRoutes: RouteObject[] = [
     {
       path: "/",
@@ -29,13 +37,14 @@ const Routes = () => {
       element: <AuthGuard />,
       children: [
         {
-          path: "/auth/:action",
+          path: "",
           element: <AuthPage />,
         },
       ],
     },
   ];
 
+  // Route yang memerlukan autentikasi.
   const needAuthRoutes: RouteObject[] = [
     {
       path: "/user",
@@ -47,7 +56,13 @@ const Routes = () => {
         },
         {
           path: "/user/quiz",
-          element: <QuestionPage />,
+          element: <QuizQuard />,
+          children: [
+            {
+              path: "",
+              element: <QuestionPage />,
+            },
+          ],
         },
         {
           path: "/user/quiz/result",
@@ -63,17 +78,19 @@ const Routes = () => {
     },
   ];
 
+  // Route yang tidak bisa diakses setelah login.
   const routeCantAccessAfterLogin: RouteObject[] = [
     {
       path: "/",
       element: <Navigate to="/user/dashboard" />,
     },
     {
-      path: "/login",
+      path: "/auth/:action",
       element: <Navigate to="/user/dashboard" />,
     },
   ];
 
+  // Menggabungkan semua route.
   const routes: RouteObject[] = [
     ...(token ? routeCantAccessAfterLogin : publicRoutes),
     ...needAuthRoutes,
@@ -92,6 +109,7 @@ const Routes = () => {
     },
   ];
 
+  // Membuat router.
   const router: RouterProviderProps["router"] = createBrowserRouter(routes);
 
   return <RouterProvider router={router} />;

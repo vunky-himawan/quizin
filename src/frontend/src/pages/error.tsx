@@ -1,6 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Link, useLocation } from "react-router-dom";
 
+/**
+ * @component NotFoundPage
+ * @description Halaman error untuk pengguna yang memasukkan URL yang tidak ada.
+ * @returns {JSX.Element} - Halaman error.
+ */
 const NotFoundPage = ({
   code,
   message,
@@ -8,7 +13,10 @@ const NotFoundPage = ({
   code?: number;
   message?: string;
 }) => {
+  // Mengambil location dari hook useLocation.
   const location = useLocation();
+
+  // Mengambil errorCode dan errorMessage dari location.
   const {
     errorCode,
     errorMessage,

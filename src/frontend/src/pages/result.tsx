@@ -5,12 +5,17 @@ import QuizLayout from "@/layouts/quizLayout";
 import { Link } from "react-router-dom";
 import { decode } from "@/utils/decode";
 
+/**
+ * @component ResultPage
+ * @description Halaman untuk menampilkan hasil kuis.
+ * @returns {JSX.Element} - Halaman untuk menampilkan hasil kuis.
+ */
 const ResultPage = () => {
+  // Mengambil konteks quiz.
   const { quizResult, setQuizResult } = useQuiz();
 
+  // Menghapus hasil kuis ketika tombol back diklik.
   const handleBack = () => {
-    localStorage.removeItem("quizResult");
-    localStorage.removeItem("difficulty");
     setQuizResult(null);
   };
 
@@ -19,7 +24,7 @@ const ResultPage = () => {
       <QuizLayout>
         <div className="col-span-4 flex flex-col gap-5">
           {quizResult?.QuizAnswers.map((question, index) => (
-            <Card key={`${question.question}-${index.toString()}`}>
+            <Card key={`${question.question}-${index}`}>
               <CardHeader>
                 <CardTitle className="text-center text-2xl">
                   {decode(question.question)}
@@ -27,37 +32,39 @@ const ResultPage = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col gap-2">
-                  {question.answers.map((answer: string, index: number) => {
-                    const key = `${answer}-${index.toString()}`;
-                    if (
-                      question.userAnswer !== question.correct_answer &&
-                      answer === question.userAnswer
-                    ) {
-                      return (
-                        <>
+                  {question.answers.map(
+                    (answer: string, answerIndex: number) => {
+                      const key = `${question.question}-${answer}-${answerIndex}`;
+                      if (
+                        question.userAnswer !== question.correct_answer &&
+                        answer === question.userAnswer
+                      ) {
+                        return (
+                          <>
+                            <div
+                              key={key}
+                              className="bg-red-400 text-white p-2 rounded-lg text-center"
+                            >
+                              {decode(answer)}
+                            </div>
+                          </>
+                        );
+                      } else {
+                        return (
                           <div
                             key={key}
-                            className="bg-red-400 text-white p-2 rounded-lg text-center"
+                            className={`${
+                              answer === question.correct_answer
+                                ? "bg-green-400 text-white "
+                                : "bg-gray-100 text-black "
+                            }  p-2 rounded-lg text-center`}
                           >
                             {decode(answer)}
                           </div>
-                        </>
-                      );
-                    } else {
-                      return (
-                        <div
-                          key={key}
-                          className={`${
-                            answer === question.correct_answer
-                              ? "bg-green-400 text-white "
-                              : "bg-gray-100 text-black "
-                          }  p-2 rounded-lg text-center`}
-                        >
-                          {decode(answer)}
-                        </div>
-                      );
+                        );
+                      }
                     }
-                  })}
+                  )}
                 </div>
               </CardContent>
             </Card>

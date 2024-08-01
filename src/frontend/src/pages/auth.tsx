@@ -11,18 +11,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast, useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/authContext";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+/**
+ * @component AuthPage
+ * @description Halaman auth untuk pengguna login atau register.
+ * @returns {JSX.Element} - Halaman auth.
+ */
 const AuthPage = () => {
+  // Mengambil action dari parameter.
   const { action } = useParams();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (action !== "login" && action !== "register") {
-      navigate("/");
-    }
-  }, [action]);
 
   return (
     <>
@@ -35,49 +34,67 @@ const AuthPage = () => {
   );
 };
 
+/**
+ * @component FormRegister
+ * @description Form untuk pengguna register.
+ * @returns {JSX.Element} - Form untuk pengguna register.
+ */
 const FormRegister = () => {
+  // Mengambil dan menyimpan nilai username dari input.
   const [username, setUsername] = useState("");
+
+  // Mengambil dan menyimpan nilai password dari input.
   const [password, setPassword] = useState("");
+
+  // Mengambil dan menyimpan nilai confirmPassword dari input.
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  // Mengambil konteks autentikasi.
   const { register, error, setError } = useAuth();
+
+  // Mengambil ref dari form.
   const formRef = useRef<HTMLFormElement>(null);
+
+  // Inisialisasi fungsi untuk navigasi.
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  /**
+   * @function handleRegister
+   * @description Fungsi untuk mendaftarkan pengguna baru.
+   * @param {React.FormEvent<HTMLFormElement>} e - Event form.
+   */
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (password !== confirmPassword) {
+      setError("Password and confirm password must be the same");
+      return;
+    }
+
+    const data = {
+      username,
+      password,
+    };
+
+    if (data.username.trim() === "" || data.password.trim() === "") {
+      setError("Username or password is empty");
+      return;
+    }
+
     try {
-      setError("");
+      await register(data.username, data.password);
 
-      if (password !== confirmPassword) {
-        setError("Password and confirm password must be the same");
-        return;
-      }
+      toast({
+        title: `User ${data.username} registered successfully`,
+        description: "Please wait...",
+        duration: 1800,
+        className: "bg-green-500 text-white",
+      });
 
-      const data = {
-        username,
-        password,
-      };
-
-      if (data.username.trim() === "" || data.password.trim() === "") {
-        alert("Username or password is empty");
-      }
-
-      const response = await register(data.username, data.password);
-
-      if (response.status === 200) {
-        toast({
-          title: `User ${data.username} registered successfully`,
-          description: "Please wait...",
-          duration: 1800,
-          className: "bg-green-500 text-white",
-        });
-
-        navigate("/auth/login");
-      }
+      navigate("/auth/login");
     } catch (error) {
-      console.error("Error while login", error);
+      setError(error as string);
     }
   };
 
@@ -151,29 +168,46 @@ const FormRegister = () => {
   );
 };
 
+/**
+ * @component FormLogin
+ * @description Form untuk pengguna login.
+ * @returns {JSX.Element} - Form untuk pengguna login.
+ */
 const FormLogin = () => {
+  // Mengambil dan menyimpan nilai username dari input.
   const [username, setUsername] = useState("");
+
+  // Mengambil dan menyimpan nilai password dari input.
   const [password, setPassword] = useState("");
+
+  // Mengambil konteks autentikasi.
   const { login, error, setError } = useAuth();
 
+  // Mengambil ref dari form.
   const formRef = useRef<HTMLFormElement>(null);
+
+  // Inisialisasi fungsi untuk navigasi.
   const navigate = useNavigate();
 
+  /**
+   * @function handleLogin
+   * @description Fungsi untuk melakukan login pengguna.
+   * @param {React.FormEvent<HTMLFormElement>} e - Event form.
+   */
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const data = {
+      username,
+      password,
+    };
+
+    if (data.username.trim() === "" || data.password.trim() === "") {
+      setError("Username dan password tidak boleh kosong");
+      return;
+    }
+
     try {
-      const data = {
-        username,
-        password,
-      };
-
-      if (data.username.trim() === "" || data.password.trim() === "") {
-        alert("Username dan password tidak boleh kosong");
-      }
-
-      setError("");
-
       await login(data.username, data.password);
 
       toast({
@@ -185,9 +219,10 @@ const FormLogin = () => {
 
       navigate("/user/dashboard");
     } catch (error) {
-      console.error("Error while login", error);
+      setError(error as string);
     }
   };
+
   return (
     <>
       <form ref={formRef} onSubmit={handleLogin} className="w-80" method="post">

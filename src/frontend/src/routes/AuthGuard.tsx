@@ -1,8 +1,16 @@
 import NotFoundPage from "@/pages/error";
-import { Navigate, Outlet, useParams } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 
+/**
+ * @component AuthGuard
+ * @description Guard untuk memastikan pengguna hanya bisa mengakses halaman /auth/login dan /auth/register.
+ * @returns {JSX.Element} - Mengembalikan halaman yang akan ditampilkan sesuai dengan action.
+ */
 const AuthGuard = () => {
+  // Mengambil action dari parameter.
   const { action } = useParams();
+
+  // Action yang valid.
   const validActions = ["login", "register"];
 
   if (!validActions.includes(action as string)) {

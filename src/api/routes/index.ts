@@ -1,12 +1,9 @@
 import express from "express";
-import { UserController } from "../controller/UserController";
 import { AuthController } from "../controller/AuthController";
 import { verifyToken } from "../middleware/verifyToken";
 import { QuizController } from "../controller/QuizController";
 
 const router = express.Router();
-
-router.get("/users", verifyToken, UserController.getAllUsers);
 
 /* Auth Routes */
 router.post("/auth/register", AuthController.Register);

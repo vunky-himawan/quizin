@@ -68,10 +68,10 @@ create database quiz_app;
 exit
 ```
 
-6. Push Schema ke Database
+6. Jalankan Migrasi
 
 ```bash
-npx drizzle-kit push
+npx drizzle-kit migrate
 ```
 
 7. Jalankan seeder

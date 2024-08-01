@@ -1,5 +1,13 @@
 {
   "version": "7",
   "dialect": "mysql",
-  "entries": []
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1722478029279,
+      "tag": "0000_mixed_blue_marvel",
+      "breakpoints": true
+    }
+  ]
 }

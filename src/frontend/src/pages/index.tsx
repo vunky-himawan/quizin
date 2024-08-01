@@ -1,5 +1,10 @@
 import { Button } from "@/components/ui/button";
 
+/**
+ * @component IndexPage
+ * @description Halaman index untuk pengguna yang tidak login.
+ * @returns {JSX.Element} - Halaman index.
+ */
 const IndexPage = () => {
   return (
     <>

@@ -8,19 +8,34 @@ import { quizAnswer, quizSessions, users } from "../database/schema";
 import { eq } from "drizzle-orm";
 import QuizResult from "../types/QuizResult";
 
+/**
+ * @function getQuizQuestion
+ * @description Fungsi untuk mendapatkan pertanyaan quiz dari API OpenTDB.
+ * @param {Request} req - Permintaan HTTP yang berisi token dan data pertanyaan quiz seperti jumlah pertanyaan, kategori, dan kesulitan.
+ * @param {Response} res - Respons HTTP.
+ * @returns {Promise<Response>} - Mengembalikan respons berupa data pertanyaan quiz yang sudah di-map.
+ */
 const getQuizQuestion = async (req: Request, res: Response) => {
   try {
     const refreshToken = req.cookies["refreshToken"];
     const difficulty = req.body.difficulty;
     const amount = req.body.amount;
     const category = req.body.category;
+    let token = req.headers["x-quiz-token"] as string;
 
-    if (!refreshToken) {
+    if (!token || !refreshToken) {
       return res.status(401).json({
         error: "unauthorized",
         message: "Unauthorized",
       });
     }
+
+    let quizQuestions = await QuestionService.getQuizQuestions({
+      difficulty,
+      amount,
+      category,
+      token,
+    });
 
     /* Mengambil user dengan refreshToken */
     const user = await db
@@ -28,28 +43,53 @@ const getQuizQuestion = async (req: Request, res: Response) => {
       .from(users)
       .where(eq(users.refreshToken, refreshToken));
 
-    const token = req.headers["x-quiz-token"];
+    if (quizQuestions.data.response_code === 3) {
+      token = await QuestionService.getNewQuizToken();
 
-    if (!token) {
-      return res.status(401).json({
-        error: "unauthorized",
-        message: "Unauthorized",
+      // sleep 5s
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+
+      quizQuestions = await QuestionService.getQuizQuestions({
+        difficulty,
+        amount,
+        category,
+        token,
       });
     }
 
-    const quizQuestion = await axios.get(
-      `https://opentdb.com/api.php?amount=${amount}&category=${category}&difficulty=${difficulty}&token=${token}`
-    );
+    if (quizQuestions.data.response_code === 4) {
+      token = await QuestionService.resetToken({ token });
 
-    if (quizQuestion.data.results.length === 0) {
+      // sleep 5s
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+
+      quizQuestions = await QuestionService.getQuizQuestions({
+        difficulty,
+        amount,
+        category,
+        token,
+      });
+    }
+
+    if (
+      quizQuestions.data.response_code === 5 ||
+      quizQuestions.data.response_code === 1
+    ) {
       return res.status(404).json({
         error: "not_found",
-        message: "Not Found",
+        message: "Quiz questions is not found",
       });
     }
 
-    /* Mengubah tipe Question ke QuizAnswer */
-    const quizMapped: QuizAnswer[] = quizQuestion.data.results.map(
+    if (quizQuestions.data.results.length === 0) {
+      return res.status(404).json({
+        error: "not_found",
+        message: "Quiz questions is not found",
+      });
+    }
+
+    /* Melakukan mapping dari tipe Question ke QuizAnswer */
+    const quizMapped: QuizAnswer[] = quizQuestions.data.results.map(
       (question: Quiz) => {
         const answers: string[] = QuestionService.randomAnswers({
           incorect_answers: question.incorrect_answers,
@@ -75,13 +115,13 @@ const getQuizQuestion = async (req: Request, res: Response) => {
     await db.transaction(async (tx) => {
       const quizSession = await tx.insert(quizSessions).values({
         userId: user[0].id,
-        totalQuestions: quizQuestion.data.results.length,
+        totalQuestions: quizQuestions.data.results.length,
         totalCorrectAnswers: 0,
         totalIncorrectAnswers: 0,
         score: 0,
       });
 
-      quizQuestion.data.results.forEach(async (question: Quiz) => {
+      quizQuestions.data.results.forEach(async (question: Quiz) => {
         await tx.insert(quizAnswer).values({
           quizSessionId: quizSession[0].insertId,
           question: question.question,
@@ -94,21 +134,23 @@ const getQuizQuestion = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).json({
       error: "server_error",
-      message: "Internal Server Error",
+      message: "Internal server error",
     });
   }
 };
 
+/**
+ * @function getQuizToken
+ * @description Fungsi untuk mendapatkan token quiz dari API OpenTDB.
+ * @param {Request} req - Permintaan HTTP yang berisi token refresh.
+ * @param {Response} res - Respons HTTP.
+ * @returns {Promise<Response>} - Mengembalikan respons berupa token quiz.
+ */
 const getQuizToken = async (req: Request, res: Response) => {
   try {
     const quizToken = await axios.get(
       "https://opentdb.com/api_token.php?command=request"
     );
-
-    res.cookie("quizToken", quizToken.data.token, {
-      httpOnly: true,
-      maxAge: 6 * 3600,
-    });
 
     res.json({
       quizToken: quizToken.data.token,
@@ -121,6 +163,13 @@ const getQuizToken = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @function getQuizResult
+ * @description Fungsi untuk mendapatkan hasil quiz dan melakukan validasi jawaban pengguna.
+ * @param {Request} req - Permintaan HTTP yang berisi token quiz, id quiz sesi, dan data pertanyaan quiz.
+ * @param {Response} res - Respons HTTP.
+ * @returns {Promise<Response>} - Mengembalikan respons berupa hasil quiz dan jawaban yang valid.
+ */
 const getQuizResult = async (req: Request, res: Response) => {
   try {
     const quizSessionId = req.body.quizSessionId;
@@ -133,27 +182,37 @@ const getQuizResult = async (req: Request, res: Response) => {
       });
     }
 
+    /* Inisialisasi variabel untuk menampilkan hasil quiz */
     let correctAnswersCount = 0;
     let incorrectAnswersCount = 0;
     let score = 0;
+
+    /* Inisialisasi variabel untuk menyimpan quiz yang sudah di-validasi */
     let quizAnswerUpdated: QuizAnswer[] = [];
 
+    /* Memulai transaksi database */
     await db.transaction(async (tx) => {
+      /* Mengambil semua jawaban quiz dari database berdasarkan id quiz sesi */
       const quizAnswers = await db
         .select()
         .from(quizAnswer)
         .where(eq(quizAnswer.quizSessionId, quizSessionId));
 
       data.forEach(async (question: QuizAnswer, index: number) => {
+        /* Mengambil jawaban yang benar */
         const correct_answer = quizAnswers[index].correctAnswer;
+
+        /* Mengambil jawaban pengguna */
         const userAnswer = question.userAnswer;
 
+        /* Melakukan validasi jawaban pengguna */
         const correctedAnswer = QuestionService.correctedAnswer({
           totalQuestions: data.length,
           correct_answer,
           userAnswer,
         });
 
+        /* Menambahkan jawaban yang sudah di-validasi ke dalam array */
         quizAnswerUpdated.push({
           ...question,
           correct_answer,
@@ -170,6 +229,7 @@ const getQuizResult = async (req: Request, res: Response) => {
         }
       });
 
+      /* Membuat objek hasil quiz */
       const quizResult: QuizResult = {
         totalQuestions: data.length,
         totalAnsweredQuestions: correctAnswersCount + incorrectAnswersCount,
@@ -180,6 +240,7 @@ const getQuizResult = async (req: Request, res: Response) => {
         QuizAnswers: quizAnswerUpdated,
       };
 
+      /* Memperbarui jumlah jawaban yang benar dan salah serta skor pada tabel quiz_sessions */
       await tx
         .update(quizSessions)
         .set({
@@ -196,11 +257,18 @@ const getQuizResult = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @function getCategories
+ * @description Fungsi untuk mendapatkan daftar kategori dari API OpenTDB.
+ * @param {Request} req - Permintaan HTTP.
+ * @param {Response} res - Respons HTTP.
+ * @returns {Promise<Response>} - Mengembalikan respons berupa daftar kategori quiz dari API OpenTDB.
+ */
 const getCategories = async (req: Request, res: Response) => {
   try {
     const categories = await axios.get("https://opentdb.com/api_category.php");
 
-    res.json(categories.data);
+    res.json({ categories: categories.data.trivia_categories });
   } catch (error) {
     return res.status(500).json({
       error: "server_error",
@@ -209,6 +277,11 @@ const getCategories = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @function QuizController
+ * @description Mengikuti semua fungsi dari controller quiz.
+ * @returns {Object} - Mengembalikan semua fungsi dari controller quiz.
+ */
 export const QuizController = {
   getQuizQuestion,
   getQuizToken,

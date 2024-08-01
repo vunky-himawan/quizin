@@ -9,6 +9,13 @@ import User from "../types/User";
 
 dotenv.config();
 
+/**
+ * @function Login
+ * @description Fungsi untuk login pengguna.
+ * @param {Request} req - Permintaan HTTP yang berisi data login pengguna (username dan password).
+ * @param {Response} res - Respons HTTP.
+ * @returns {Promise<Response>} - Mengembalikan respons berupa token.
+ */
 const Login = async (req: Request, res: Response) => {
   try {
     const user: User[] = await db
@@ -64,6 +71,13 @@ const Login = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @function RefreshToken
+ * @description Fungsi untuk mendapatkan token refresh.
+ * @param {Request} req - Permintaan HTTP yang berisi token refresh.
+ * @param {Response} res - Respons HTTP.
+ * @returns {Promise<Response>} - Mengembalikan respons berupa token.
+ */
 const RefreshToken = async (req: Request, res: Response) => {
   try {
     const refreshToken: string = req.cookies.refreshToken;
@@ -115,6 +129,13 @@ const RefreshToken = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @function Logout
+ * @description Fungsi untuk logout pengguna.
+ * @param {Request} req - Permintaan HTTP yang berisi token refresh.
+ * @param {Response} res - Respons HTTP.
+ * @returns {Promise<Response>} - Mengembalikan respons berupa status 200.
+ */
 const Logout = async (req: Request, res: Response) => {
   try {
     const refreshToken: string = req.cookies.refreshToken;
@@ -148,6 +169,13 @@ const Logout = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @function Register
+ * @description Fungsi untuk mendaftarkan pengguna baru.
+ * @param {Request} req - Permintaan HTTP yang berisi data pengguna baru (username dan password).
+ * @param {Response} res - Respons HTTP.
+ * @returns {Promise<Response>} - Mengembalikan respons berupa status 200.
+ */
 const Register = async (req: Request, res: Response) => {
   try {
     const user: User[] = await db
@@ -179,6 +207,11 @@ const Register = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * @function AuthController
+ * @description Mengikuti semua fungsi dari controller auth.
+ * @returns {Object} - Mengembalikan semua fungsi dari controller auth.
+ */
 export const AuthController = {
   Login,
   Register,

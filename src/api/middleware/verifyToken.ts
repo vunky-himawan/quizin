@@ -1,6 +1,14 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
+/**
+ * @function verifyToken
+ * @description Middleware untuk memverifikasi token.
+ * @param {Request} req - Permintaan HTTP.
+ * @param {Response} res - Respons HTTP.
+ * @param {NextFunction} next - Fungsi untuk melanjutkan ke proses selanjutnya.
+ * @returns {Promise<Response>} - Mengembalikan respons berupa token.
+ */
 export const verifyToken = (
   req: Request,
   res: Response,

@@ -4,13 +4,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import QuizLayout from "@/layouts/quizLayout";
 import { Link } from "react-router-dom";
 import { decode } from "@/utils/decode";
+import { v4 as uuidv4 } from "uuid";
 
+/**
+ * @component ResultPage
+ * @description Halaman untuk menampilkan hasil kuis.
+ * @returns {JSX.Element} - Halaman untuk menampilkan hasil kuis.
+ */
 const ResultPage = () => {
+  // Mengambil konteks quiz.
   const { quizResult, setQuizResult } = useQuiz();
 
+  // Menghapus hasil kuis ketika tombol back diklik.
   const handleBack = () => {
-    localStorage.removeItem("quizResult");
-    localStorage.removeItem("difficulty");
     setQuizResult(null);
   };
 
@@ -19,7 +25,7 @@ const ResultPage = () => {
       <QuizLayout>
         <div className="col-span-4 flex flex-col gap-5">
           {quizResult?.QuizAnswers.map((question, index) => (
-            <Card key={`${question.question}-${index.toString()}`}>
+            <Card key={`${question.question}-${index}`}>
               <CardHeader>
                 <CardTitle className="text-center text-2xl">
                   {decode(question.question)}
@@ -27,8 +33,10 @@ const ResultPage = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col gap-2">
-                  {question.answers.map((answer: string, index: number) => {
-                    const key = `${answer}-${index.toString()}`;
+                  {question.answers.map((answer: string, ansIndex: number) => {
+                    const key = `${
+                      question.question
+                    }-${answer}-${index}-${ansIndex}-${uuidv4()}`;
                     if (
                       question.userAnswer !== question.correct_answer &&
                       answer === question.userAnswer
@@ -65,7 +73,7 @@ const ResultPage = () => {
         </div>
         <div>
           <div className="flex flex-col gap-5 sticky top-20 bg-white">
-            <Link to="/user/dashboard">
+            <Link to="/user/dashboard" className="w-fit">
               <Button className="text-white" onClick={handleBack}>
                 Back and Remove
               </Button>

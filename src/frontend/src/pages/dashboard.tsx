@@ -24,6 +24,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/authContext";
 import { useQuiz } from "@/context/quizContext";
 import { useEffect, useState } from "react";
@@ -46,6 +47,8 @@ const DashboardPage = () => {
     difficulty,
     setDifficulty,
     generateCategories,
+    quizError,
+    setQuizError,
   } = useQuiz();
 
   // Mengambil dan menyimpan nilai selectedCategory dari localStorage.
@@ -69,18 +72,31 @@ const DashboardPage = () => {
    * @param {number} category - Kategori kuis.
    */
   const handleStart = async (category: number) => {
-    setIsStarted(true);
-    localStorage.setItem(
-      `X-CATEGORY-SELECTED-${username}`,
-      category.toString()
-    );
-    localStorage.setItem(`X-QUIZ-DIFFICULTY-${username}`, difficulty);
-    setIsPaused(false);
-    setSelectedCategory(category);
-    if (!localStorage.getItem(`X-Quiz-Questions-${username}`)) {
-      await generateQuestion(difficulty, category);
+    try {
+      if (!localStorage.getItem(`X-Quiz-Questions-${username}`)) {
+        await generateQuestion(difficulty, category);
+      }
+
+      setIsStarted(true);
+      localStorage.setItem(
+        `X-CATEGORY-SELECTED-${username}`,
+        category.toString()
+      );
+      localStorage.setItem(`X-QUIZ-DIFFICULTY-${username}`, difficulty);
+      setIsPaused(false);
+      setSelectedCategory(category);
+
+      toast({
+        title: "Success generate questions",
+        description: "Have fun taking the quiz, good luck!",
+        duration: 2000,
+        className: "bg-green-500 text-white",
+      });
+
+      navigate("/user/quiz");
+    } catch (error) {
+      setQuizError(error as string);
     }
-    navigate("/user/quiz");
   };
 
   /**
@@ -104,6 +120,7 @@ const DashboardPage = () => {
           )
         : []
     );
+
     navigate("/user/quiz");
   };
 
@@ -136,6 +153,17 @@ const DashboardPage = () => {
       );
     }
   }, [username]);
+
+  useEffect(() => {
+    if (quizError !== "") {
+      toast({
+        title: "Error",
+        description: quizError,
+        duration: 2000,
+        variant: "destructive",
+      });
+    }
+  }, [quizError]);
 
   /**
    * @function useEffect

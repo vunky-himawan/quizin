@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import QuizLayout from "@/layouts/quizLayout";
 import { Link } from "react-router-dom";
 import { decode } from "@/utils/decode";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * @component ResultPage
@@ -32,39 +33,39 @@ const ResultPage = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col gap-2">
-                  {question.answers.map(
-                    (answer: string, answerIndex: number) => {
-                      const key = `${question.question}-${answer}-${answerIndex}`;
-                      if (
-                        question.userAnswer !== question.correct_answer &&
-                        answer === question.userAnswer
-                      ) {
-                        return (
-                          <>
-                            <div
-                              key={key}
-                              className="bg-red-400 text-white p-2 rounded-lg text-center"
-                            >
-                              {decode(answer)}
-                            </div>
-                          </>
-                        );
-                      } else {
-                        return (
+                  {question.answers.map((answer: string, ansIndex: number) => {
+                    const key = `${
+                      question.question
+                    }-${answer}-${index}-${ansIndex}-${uuidv4()}`;
+                    if (
+                      question.userAnswer !== question.correct_answer &&
+                      answer === question.userAnswer
+                    ) {
+                      return (
+                        <>
                           <div
                             key={key}
-                            className={`${
-                              answer === question.correct_answer
-                                ? "bg-green-400 text-white "
-                                : "bg-gray-100 text-black "
-                            }  p-2 rounded-lg text-center`}
+                            className="bg-red-400 text-white p-2 rounded-lg text-center"
                           >
                             {decode(answer)}
                           </div>
-                        );
-                      }
+                        </>
+                      );
+                    } else {
+                      return (
+                        <div
+                          key={key}
+                          className={`${
+                            answer === question.correct_answer
+                              ? "bg-green-400 text-white "
+                              : "bg-gray-100 text-black "
+                          }  p-2 rounded-lg text-center`}
+                        >
+                          {decode(answer)}
+                        </div>
+                      );
                     }
-                  )}
+                  })}
                 </div>
               </CardContent>
             </Card>
@@ -72,7 +73,7 @@ const ResultPage = () => {
         </div>
         <div>
           <div className="flex flex-col gap-5 sticky top-20 bg-white">
-            <Link to="/user/dashboard">
+            <Link to="/user/dashboard" className="w-fit">
               <Button className="text-white" onClick={handleBack}>
                 Back and Remove
               </Button>

@@ -44,7 +44,7 @@ const getQuizQuestion = async (req: Request, res: Response) => {
     if (quizQuestion.data.results.length === 0) {
       return res.status(404).json({
         error: "not_found",
-        message: "Not Found",
+        message: "Quiz questions is not found",
       });
     }
 

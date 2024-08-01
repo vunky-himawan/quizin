@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, InternalAxiosRequestConfig } from "axios";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useState } from "react";
 import { jwtDecode, JwtPayload } from "jwt-decode";
 
 const AuthContext = createContext({} as ContextType);

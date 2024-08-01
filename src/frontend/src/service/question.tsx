@@ -48,48 +48,44 @@ const getQuizQuestions = async ({
   difficulty: string;
   category: number;
 }) => {
-  try {
-    const token = await getQuizToken({ axiosRefreshToken });
-    let amount = 10;
+  const token = await getQuizToken({ axiosRefreshToken });
+  let amount = 10;
 
-    switch (difficulty) {
-      case "easy":
-        amount = 10;
-        break;
-      case "medium":
-        amount = 25;
-        break;
-      case "hard":
-        amount = 50;
-        break;
-    }
-
-    if (!token) {
-      return null;
-    }
-
-    const response = await axiosRefreshToken.post(
-      "http://localhost:3000/quiz/questions",
-      {
-        difficulty,
-        amount,
-        category,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "X-Quiz-Token": token,
-        },
-      }
-    );
-
-    return {
-      quizSessionId: response.data.quizSession[0].insertId,
-      mapped: response.data.mapped,
-    };
-  } catch (error) {
-    console.log(error);
+  switch (difficulty) {
+    case "easy":
+      amount = 10;
+      break;
+    case "medium":
+      amount = 25;
+      break;
+    case "hard":
+      amount = 50;
+      break;
   }
+
+  if (!token) {
+    return null;
+  }
+
+  const response = await axiosRefreshToken.post(
+    "http://localhost:3000/quiz/questions",
+    {
+      difficulty,
+      amount,
+      category,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        "X-Quiz-Token": token,
+      },
+    }
+  );
+
+  return {
+    quizSessionId: response.data.quizSession[0].insertId,
+    mapped: response.data.mapped,
+  };
 };
 
 /**

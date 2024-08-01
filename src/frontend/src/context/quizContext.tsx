@@ -1,10 +1,10 @@
-import { useToast } from "@/components/ui/use-toast";
 import { QuestionService } from "@/service/question";
 import { createContext, useContext, useState } from "react";
 import { useAuth } from "./authContext";
 import QuizAnswer from "@/types/QuizAnswer";
 import Category from "@/types/Category";
 import QuizResult from "@/types/QuizResult";
+import axios from "axios";
 
 const QuizContext = createContext({} as QuizContextType);
 
@@ -20,6 +20,8 @@ type QuizContextType = {
   setQuizResult: (result: QuizResult | null) => void;
   difficulty: string;
   setDifficulty: (difficulty: string) => void;
+  quizError: string;
+  setQuizError: (error: string) => void;
 };
 
 /**
@@ -54,7 +56,9 @@ const QuizProvider = ({ children }: { children: React.ReactNode }) => {
         )
       : []
   );
-  const { toast } = useToast();
+
+  // Mengambil menyimpan error dari quiz.
+  const [quizError, setQuizError] = useState<string>("");
 
   /**
    * @function generateCategories
@@ -75,33 +79,34 @@ const QuizProvider = ({ children }: { children: React.ReactNode }) => {
    * @param {number} category - Kategori quiz.
    */
   const generateQuestion = async (difficulty: string, category: number) => {
-    toast({
-      title: "Generating Question...",
-      description: "Please wait...",
-      duration: 2000,
-      variant: "destructive",
-    });
+    try {
+      const response = await QuestionService.getQuizQuestions({
+        axiosRefreshToken,
+        difficulty,
+        category,
+      });
 
-    const response = await QuestionService.getQuizQuestions({
-      axiosRefreshToken,
-      difficulty,
-      category,
-    });
+      const sessionId = response?.quizSessionId;
+      const quizQuestions = response?.mapped;
 
-    const sessionId = response?.quizSessionId;
-    const quizQuestions = response?.mapped;
+      setQuizSession(sessionId);
+      setQuizQuestions(quizQuestions);
 
-    setQuizSession(sessionId);
-    setQuizQuestions(quizQuestions);
-
-    localStorage.setItem(
-      `X-Quiz-Questions-${username}`,
-      JSON.stringify(quizQuestions)
-    );
-    localStorage.setItem(
-      `X-Quiz-Session-Id-${username}`,
-      sessionId?.toString()
-    );
+      localStorage.setItem(
+        `X-Quiz-Questions-${username}`,
+        JSON.stringify(quizQuestions)
+      );
+      localStorage.setItem(
+        `X-Quiz-Session-Id-${username}`,
+        sessionId?.toString()
+      );
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw error.response?.data.message;
+      } else {
+        throw "An unexpected error occurred";
+      }
+    }
   };
 
   /**
@@ -137,10 +142,12 @@ const QuizProvider = ({ children }: { children: React.ReactNode }) => {
     handleFinish,
     quizResult,
     generateCategories,
+    quizError,
     categories,
     setQuizResult,
     difficulty,
     setDifficulty,
+    setQuizError,
   };
 
   return <QuizContext.Provider value={value}>{children}</QuizContext.Provider>;

@@ -13,22 +13,18 @@ const getQuizToken = async ({
 }: {
   axiosRefreshToken: AxiosInstance;
 }) => {
-  try {
-    const response = await axiosRefreshToken.get(
-      "http://localhost:3000/quiz/token",
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+  const response = await axiosRefreshToken.get(
+    "http://localhost:3000/quiz/token",
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
 
-    const token = response.data.quizToken;
+  const token = response.data.quizToken;
 
-    return token;
-  } catch (error) {
-    console.log(error);
-  }
+  return token;
 };
 
 /**
@@ -43,12 +39,13 @@ const getQuizQuestions = async ({
   axiosRefreshToken,
   difficulty,
   category,
+  token,
 }: {
   axiosRefreshToken: AxiosInstance;
   difficulty: string;
   category: number;
+  token: string;
 }) => {
-  const token = await getQuizToken({ axiosRefreshToken });
   let amount = 10;
 
   switch (difficulty) {
@@ -99,20 +96,16 @@ const getCategories = async ({
 }: {
   axiosRefreshToken: AxiosInstance;
 }) => {
-  try {
-    const response = await axiosRefreshToken.get(
-      "http://localhost:3000/quiz/categories",
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
+  const response = await axiosRefreshToken.get(
+    "http://localhost:3000/quiz/categories",
+    {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    }
+  );
 
-    return response.data;
-  } catch (error) {
-    console.log(error);
-  }
+  return response;
 };
 
 /**

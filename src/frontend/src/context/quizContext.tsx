@@ -22,6 +22,8 @@ type QuizContextType = {
   setDifficulty: (difficulty: string) => void;
   quizError: string;
   setQuizError: (error: string) => void;
+  quizToken: string;
+  getQuizToken: () => void;
 };
 
 /**
@@ -37,6 +39,11 @@ const QuizProvider = ({ children }: { children: React.ReactNode }) => {
   // Mengambil dan menyimpan nilai difficulty dari localStorage.
   const [difficulty, setDifficulty] = useState<string>(
     localStorage.getItem(`X-QUIZ-DIFFICULTY-${username}`) ?? ""
+  );
+
+  // Mengambil dan menyimpan nilai quizToken dari localStorage.
+  const [quizToken, setQuizToken] = useState<string>(
+    localStorage.getItem("X-QUIZ-TOKEN") ?? ""
   );
 
   // Mengambil dan menyimpan nilai quizSession dari localStorage.
@@ -65,11 +72,15 @@ const QuizProvider = ({ children }: { children: React.ReactNode }) => {
    * @description Fungsi untuk mengambil daftar kategori quiz.
    */
   const generateCategories = async () => {
-    const response = await QuestionService.getCategories({
-      axiosRefreshToken,
-    });
+    try {
+      const response = await QuestionService.getCategories({
+        axiosRefreshToken,
+      });
 
-    setCategories(response.trivia_categories);
+      setCategories(response?.data.categories ?? []);
+    } catch (error) {
+      setQuizError(error as string);
+    }
   };
 
   /**
@@ -84,6 +95,7 @@ const QuizProvider = ({ children }: { children: React.ReactNode }) => {
         axiosRefreshToken,
         difficulty,
         category,
+        token: quizToken,
       });
 
       const sessionId = response?.quizSessionId;
@@ -125,12 +137,26 @@ const QuizProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     setQuizResult(response as QuizResult);
+    setQuizError("");
 
     localStorage.removeItem(`X-Quiz-Session-Id-${username}`);
     localStorage.removeItem(`X-Quiz-Questions-${username}`);
     localStorage.removeItem(`X-CATEGORY-SELECTED-${username}`);
     localStorage.removeItem(`X-ELAPSED-TIME-${username}`);
     localStorage.removeItem(`X-QUIZ-DIFFICULTY-${username}`);
+  };
+
+  /**
+   * @function getQuizToken
+   * @description Fungsi untuk mengambil token quiz.
+   */
+  const getQuizToken = async () => {
+    const response = await QuestionService.getQuizToken({
+      axiosRefreshToken,
+    });
+
+    setQuizToken(response);
+    localStorage.setItem("X-QUIZ-TOKEN", response);
   };
 
   // Mengembalikan nilai dari konteks quiz.
@@ -141,7 +167,9 @@ const QuizProvider = ({ children }: { children: React.ReactNode }) => {
     generateQuestion,
     handleFinish,
     quizResult,
+    getQuizToken,
     generateCategories,
+    quizToken,
     quizError,
     categories,
     setQuizResult,

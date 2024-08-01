@@ -27,6 +27,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/use-toast";
 import { useAuth } from "@/context/authContext";
 import { useQuiz } from "@/context/quizContext";
+import { ReloadIcon } from "@radix-ui/react-icons";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -37,7 +38,7 @@ import { useNavigate } from "react-router-dom";
  */
 const DashboardPage = () => {
   // Mengambil konteks autentikasi.
-  const { username, refreshToken } = useAuth();
+  const { username, refreshToken, token } = useAuth();
 
   // Mengambil konteks quiz.
   const {
@@ -47,6 +48,8 @@ const DashboardPage = () => {
     difficulty,
     setDifficulty,
     generateCategories,
+    getQuizToken,
+    quizToken,
     quizError,
     setQuizError,
   } = useQuiz();
@@ -73,11 +76,11 @@ const DashboardPage = () => {
    */
   const handleStart = async (category: number) => {
     try {
+      setIsStarted(true);
       if (!localStorage.getItem(`X-Quiz-Questions-${username}`)) {
         await generateQuestion(difficulty, category);
       }
 
-      setIsStarted(true);
       localStorage.setItem(
         `X-CATEGORY-SELECTED-${username}`,
         category.toString()
@@ -95,6 +98,7 @@ const DashboardPage = () => {
 
       navigate("/user/quiz");
     } catch (error) {
+      setIsStarted(false);
       setQuizError(error as string);
     }
   };
@@ -154,6 +158,10 @@ const DashboardPage = () => {
     }
   }, [username]);
 
+  /**
+   * @function useEffect
+   * @description Digunakan untuk menampilkan error ketika terjadi kesalahan.
+   */
   useEffect(() => {
     if (quizError !== "") {
       toast({
@@ -162,6 +170,8 @@ const DashboardPage = () => {
         duration: 2000,
         variant: "destructive",
       });
+
+      setQuizError("");
     }
   }, [quizError]);
 
@@ -178,6 +188,16 @@ const DashboardPage = () => {
     initialize();
   }, [refreshToken]);
 
+  /**
+   * @function useEffect
+   * @description Digunakan untuk mengambil token quiz dari API OpenTDB ketika access token tersedia.
+   */
+  useEffect(() => {
+    if (token !== "" && quizToken === "") {
+      getQuizToken();
+    }
+  }, [token]);
+
   return (
     <>
       <main className="h-fit overflow-x-hidden relative flex flex-col p-5">
@@ -185,9 +205,10 @@ const DashboardPage = () => {
         <section className="max-w-7xl mx-auto h-full gap-5 w-full py-24 flex flex-col">
           {isLoading && <DashboardSkeleton />}
           {categories.length > 0 &&
+            !isLoading &&
             username !== "" &&
             categories.map((category) => (
-              <Dialog key={category.id}>
+              <Dialog onOpenChange={() => setDifficulty("")} key={category.id}>
                 <Card key={category.id}>
                   <CardHeader>
                     <CardTitle>{category.name}</CardTitle>
@@ -227,12 +248,19 @@ const DashboardPage = () => {
                     </SelectContent>
                   </Select>
                   <DialogFooter>
-                    <Button
-                      disabled={difficulty === "" || isStarted}
-                      onClick={() => handleStart(category.id)}
-                    >
-                      Confirm
-                    </Button>
+                    {isStarted ? (
+                      <Button disabled>
+                        <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                        Please wait
+                      </Button>
+                    ) : (
+                      <Button
+                        disabled={difficulty === ""}
+                        onClick={() => handleStart(category.id)}
+                      >
+                        Confirm
+                      </Button>
+                    )}
                     <DialogClose>Cancel</DialogClose>
                   </DialogFooter>
                 </DialogContent>

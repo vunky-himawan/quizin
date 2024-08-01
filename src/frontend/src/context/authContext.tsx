@@ -91,6 +91,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       await axios.delete("http://localhost:3000/auth/logout").then(() => {
         localStorage.removeItem("token");
         localStorage.removeItem(`X-USERNAME-${username}`);
+        localStorage.removeItem("X-QUIZ-TOKEN");
         setToken(null);
       });
     } catch (error) {

@@ -23,7 +23,7 @@ const ResultPage = () => {
   return (
     <>
       <QuizLayout>
-        <div className="col-span-4 flex flex-col gap-5">
+        <div className="col-span-4 flex flex-col gap-5 order-2 lg:order-1">
           {quizResult?.QuizAnswers.map((question, index) => (
             <Card key={`${question.question}-${index}`}>
               <CardHeader>
@@ -71,7 +71,7 @@ const ResultPage = () => {
             </Card>
           ))}
         </div>
-        <div>
+        <div className="order-1 lg:order-2">
           <div className="flex flex-col gap-5 sticky top-20 bg-white">
             <Link to="/user/dashboard" className="w-fit">
               <Button className="text-white" onClick={handleBack}>

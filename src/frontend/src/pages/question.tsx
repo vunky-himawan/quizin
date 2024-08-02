@@ -219,9 +219,9 @@ const QuestionPage = () => {
 
   return (
     <>
-      <section className="max-w-7xl mx-auto h-full gap-5 w-full pt-24 p-5 grid grid-cols-5">
+      <section className="max-w-7xl mx-auto h-full gap-5 w-full lg:pt-24 p-5 flex flex-col lg:grid lg:grid-cols-5">
         {!isStarted && (
-          <Card className="col-span-4">
+          <Card className="col-span-4 order-2 lg:order-1">
             <CardHeader>
               <CardTitle className="text-center text-2xl">Loading...</CardTitle>
             </CardHeader>
@@ -233,7 +233,7 @@ const QuestionPage = () => {
           </Card>
         )}
         {isStarted && (
-          <Card className="col-span-4">
+          <Card className="col-span-4 order-2 lg:order-2">
             <CardHeader>
               <CardTitle className="text-center text-2xl select-none">
                 {decode(currentQuizQuestion.question)}
@@ -259,7 +259,7 @@ const QuestionPage = () => {
           </Card>
         )}
 
-        <div className="flex flex-col gap-5">
+        <div className="flex flex-col gap-5 order-1 lg:order-2">
           <Card>
             <CardHeader>
               <CardTitle className="text-center text-2xl">Timer</CardTitle>
